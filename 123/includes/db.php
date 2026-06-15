@@ -1,21 +1,20 @@
 <?php
-// Database configuration
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');         // Change to your MySQL username
-define('DB_PASS', 'joel123');             // Change to your MySQL password
-define('DB_NAME', 'taskify_db');
+// Database configuration - PostgreSQL with Render
+$db_host = getenv('DB_HOST') ?: 'localhost';
+$db_user = getenv('DB_USER') ?: 'postgres';
+$db_pass = getenv('DB_PASS') ?: 'joel123';
+$db_name = getenv('DB_NAME') ?: 'taskify_db';
+$db_port = getenv('DB_PORT') ?: 5432;
 
-// Create connection
-$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-
-// Check connection
-if ($conn->connect_error) {
+// Create PostgreSQL connection using PDO
+try {
+    $dsn = "pgsql:host=$db_host;port=$db_port;dbname=$db_name";
+    $conn = new PDO($dsn, $db_user, $db_pass);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
     die(json_encode([
         'success' => false,
-        'message' => 'Database connection failed: ' . $conn->connect_error
+        'message' => 'Database connection failed: ' . $e->getMessage()
     ]));
 }
-
-// Set charset
-$conn->set_charset("utf8mb4");
 ?>
